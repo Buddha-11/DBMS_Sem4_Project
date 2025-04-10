@@ -1,8 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
-
+const userRoutes = require('./routes/user.routes');
+const featureRoutes = require("./routes/feature.routes")
+const taskRoutes = require("./routes/task.routes")
+const projectRoutes = require("./routes/project.routes")
+const collaborationRoutes = require("./routes/collaboration.routes")
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -13,8 +16,12 @@ app.get('/', (req, res) => {
     res.json("Hello");
 });
 
-// User Routes
+// Routes
 app.use('/api', userRoutes);
+app.use('/api', featureRoutes);
+app.use('/api', taskRoutes);
+app.use('/api', projectRoutes);
+app.use('/api', collaborationRoutes);
 
 // Start server
 app.listen(PORT, () => {
