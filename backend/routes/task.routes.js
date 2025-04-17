@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const {createTask,getProjectTasks , addSubtask} = require("../controllers/task.controllers")
 router.post('/tasks', async (req, res) => {
-    const { title, description, due_date, priority_id, status_id, created_by, project_id } = req.body;
+    const { title, description, due_date, priority, status, created_by, project_id } = req.body;
     try {
-      const id = await createTask(title, description, due_date, priority_id, status_id, created_by, project_id);
+      const id = await createTask(title, description, due_date, priority, status, created_by, project_id);
       res.status(201).json({ task_id: id });
     } catch (err) {
       res.status(500).json({ error: err.message });
