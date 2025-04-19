@@ -9,10 +9,14 @@ const createProject = async (name, description, created_by) => {
   };
   
 const getUserProjects = async (user_id) => {
+  console.log(user_id);
+  
   const [rows] = await pool.query(
     `SELECT * FROM projects WHERE created_by = ?`,
     [user_id]
   );
+  console.log(rows);
+  
   return rows;
 };
 

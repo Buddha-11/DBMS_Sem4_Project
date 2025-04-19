@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.JWT_SECRET
+
 const createUser = async (name, email, password, phone) => {
   const saltRounds = 10;
   const password_hash = await bcrypt.hash(password, saltRounds);
@@ -13,7 +14,8 @@ const createUser = async (name, email, password, phone) => {
   );
 
   const token = jwt.sign({ user_id: result.insertId, email }, SECRET_KEY, { expiresIn: '1h' });
-
+  console.log(token);
+  
   return { user_id: result.insertId, token };
 };
 
@@ -26,7 +28,7 @@ const signInUser = async (email, password) => {
   const match = await bcrypt.compare(password, user.password_hash);
   if (!match) throw new Error('Invalid credentials');
 
-  const token = jwt.sign({ user_id: user.user_id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ user_id: user.user_id, email: user.email }, SECRET_KEY, { expiresIn: '10h' });
 
   return { user, token };
 };

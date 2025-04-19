@@ -1,10 +1,10 @@
 const pool = require("../config/db");
 
 // ---------- CHECKLIST ----------
-const addChecklistItem = async (task_id, title, completed = false) => {
+const addChecklistItem = async (task_id, title, description,completed = false) => {
   const [result] = await pool.query(
-    `INSERT INTO checklist (task_id, title, completed) VALUES (?, ?, ?)`,
-    [task_id, title, completed]
+    `INSERT INTO checklist (task_id, title, completed,decription) VALUES (?, ?, ?, ?)`,
+    [task_id, title, completed, description]
   );
   return result.insertId;
 };
@@ -17,6 +17,13 @@ const deleteChecklistItem = async (checklist_id) => {
   return result.affectedRows > 0;
 };
 
+const updateChecklistItem = async (checklist_id, completed) => {
+  const [result] = await pool.query(
+    `UPDATE checklist SET  completed = ? WHERE checklist_id = ?`,
+    [ completed, checklist_id]
+  );
+  return result.affectedRows > 0;
+};
 // ---------- REMINDERS ----------
 const setReminder = async (task_id, reminder_time, method) => {
   const [result] = await pool.query(
@@ -57,5 +64,6 @@ module.exports = {
   addComment,
   deleteComment,
   setReminder,
-  deleteReminder
+  deleteReminder,
+  updateChecklistItem
 };

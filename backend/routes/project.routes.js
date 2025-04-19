@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const {createProject, getUserProjects ,getProjectById,updateProject,deleteProject} = require("../controllers/project.controllers")
-
+const {verifyToken }= require('../middlewares/auth.middleware')
+router.use(verifyToken);
 router.post('/projects', async (req, res) => {
-    const { name, description, created_by } = req.body;
+    const { name, description} = req.body;
     try {
+      const created_by = req.user.id; // Assuming the user ID is stored in req.user
       const id = await createProject(name, description, created_by);
       res.status(201).json({ project_id: id });
     } catch (err) {
@@ -12,10 +14,15 @@ router.post('/projects', async (req, res) => {
     }
   });
   
-router.get('/projects/:user_id', async (req, res) => {
+  router.get('/projects', async (req, res) => {
     try {
-      const projects = await getUserProjects(req.params.user_id);
-      res.json(projects);
+      const userId = req.user.id; 
+      console.log(userId);
+      
+      const projects = await getUserProjects(userId);
+      console.log(projects);
+      
+      res.json({ projects });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

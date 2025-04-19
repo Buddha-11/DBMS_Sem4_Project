@@ -47,15 +47,16 @@ const initializeDB = async () => {
         title VARCHAR(255),
         description TEXT,
         due_date DATETIME,
-        FOREIGN KEY (task_id) REFERENCES tasks(task_id)
+        FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
       );
 
       CREATE TABLE IF NOT EXISTS checklist (
         checklist_id INT AUTO_INCREMENT PRIMARY KEY,
         task_id INT,
         title VARCHAR(255),
-        completed BOOLEAN,
-        FOREIGN KEY (task_id) REFERENCES tasks(task_id)
+        description TEXT,
+        completed BOOLEAN DEFAULT FALSE,
+        FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
       );
 
       CREATE TABLE IF NOT EXISTS reminder (

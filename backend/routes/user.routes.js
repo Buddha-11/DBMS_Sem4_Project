@@ -1,5 +1,6 @@
 const express = require('express');
-const {createUser ,getAllUsers ,getUserById,updateUser,signInUser} = require("../controllers/user.controllers")
+const {createUser ,getAllUsers ,getUserById,updateUser,signInUser} = require("../controllers/user.controllers");
+const { verifyToken } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
 router.post('/users', async (req, res) => {
@@ -14,9 +15,9 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.get('/users/:user_id', async (req, res) => {
+router.get('/users',verifyToken, async (req, res) => {
   try {
-    const user = await getUserById(req.params.user_id);
+    const user = await getUserById(req.user.id);
     console.log(user);
     
     res.json(user);
@@ -25,21 +26,11 @@ router.get('/users/:user_id', async (req, res) => {
   }
 });
 
-router.get('/users', async (req, res) => {
-  try {
-    const users = await getAllUsers();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-);
-router.put('/users/:user_id', async (req, res) => {
-  const { user_id } = req.params;
+router.put('/users', async (req, res) => {
   const updateData = req.body;
 
   try {
-    const updated = await updateUser(user_id, updateData);
+    const updated = await updateUser(req.user.id, updateData);
     if (updated) {
       res.json({ message: 'User updated successfully' });
     } else {

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {addChecklistItem, setReminder,addComment,deleteChecklistItem,deleteComment,deleteReminder} = require("../controllers/features.controllers")
+const {addChecklistItem, setReminder,addComment,deleteChecklistItem,deleteComment,deleteReminder,updateChecklistItem} = require("../controllers/features.controllers")
 // ---------- CHECKLIST ----------
 router.post('/checklist', async (req, res) => {
-    const { task_id, title, completed } = req.body;
+    const { task_id, title, completed , description} = req.body;
     try {
-      const id = await addChecklistItem(task_id, title, completed);
+      const id = await addChecklistItem(task_id, title, completed,description);
       res.status(201).json({ checklist_id: id });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -23,6 +23,20 @@ router.post('/checklist', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
+  router.put('/checklist/:checklist_id', async (req, res) => {
+    const { completed } = req.body;
+    try {
+      const updated = await updateChecklistItem(req.params.checklist_id, completed);
+      if (updated) {
+        res.json({ message: 'Checklist item updated successfully' });
+      } else {
+        res.status(404).json({ error: 'Checklist item not found' });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+  );
   // ---------- REMINDERS ----------
   router.post('/reminders', async (req, res) => {
     const { task_id, reminder_time, method } = req.body;
