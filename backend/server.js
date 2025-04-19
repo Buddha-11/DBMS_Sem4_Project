@@ -7,7 +7,6 @@ const taskRoutes = require("./routes/task.routes")
 const projectRoutes = require("./routes/project.routes")
 const collaborationRoutes = require("./routes/collaboration.routes")
 const app = express();
-const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,6 +27,7 @@ app.use('/api', projectRoutes);
 app.use('/api', collaborationRoutes);
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+  }
