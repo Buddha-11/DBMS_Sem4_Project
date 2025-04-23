@@ -6,12 +6,6 @@ const formatDate = (date) => {
 // ---------- CREATE TASK ----------
 const createTask = async (title, description, due_date, priority, status, created_by, project_id) => {
   
-  const formatDate = (date) => {
-    const d = new Date(date);
-    return d.toISOString().slice(0, 19).replace("T", " ");
-  };
-  
-  due_date = formatDate(due_date);
   console.log('Creating task with:', {
     title,
     description,
@@ -52,10 +46,16 @@ const getUserTasks = async (created_by) => {
 
 
 // ---------- UPDATE TASK ----------
-const formatDateForMySQL = (dateOrString) => {
+function formatDateForMySQL(dateOrString) {
   const date = new Date(dateOrString);
-  return date.toISOString().slice(0, 19).replace('T', ' ');
-};
+
+  // Convert to local time by subtracting the timezone offset
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
+  // Format as "YYYY-MM-DD HH:mm:ss"
+  return localDate.toISOString().slice(0, 19).replace('T', ' ');
+}
+
 
 const updateTask = async (task_id, updates) => {
   try {
@@ -130,10 +130,14 @@ const deleteSubtask = async (subtask_id) => {
 
 // ---------- DELETE TASK (cascading deletes assumed in schema) ----------
 const deleteTask = async (task_id) => {
+  console.log("Deleting task with ID:", task_id);
+  
   const [result] = await pool.query(
     `DELETE FROM tasks WHERE task_id = ?`,
     [task_id]
   );
+  console.log("Delete result:", result);
+  
   return result.affectedRows > 0;
 };
 

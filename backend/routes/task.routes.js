@@ -86,6 +86,8 @@ router.patch('/tasks/status/:task_id', async (req, res) => {
 // ✅ Delete a task (with cascade)
 router.delete('/tasks/:task_id', async (req, res) => {
   try {
+    console.log(req.params.task_id);
+    
     await deleteTask(req.params.task_id);
     res.status(200).json({ message: "Task and related data deleted" });
   } catch (err) {
