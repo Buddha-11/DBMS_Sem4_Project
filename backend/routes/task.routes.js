@@ -19,8 +19,9 @@ router.use(verifyToken);
 // Create a task
 router.post('/tasks', async (req, res) => {
   console.log('create task hit');
-  
+
   const { title, description, due_date, priority, status, project_id } = req.body;
+
   try {
     const created_by = req.user.id; // Assuming the user ID is stored in req.user
     console.log(
@@ -32,13 +33,29 @@ router.post('/tasks', async (req, res) => {
       status,
       project_id
     );
-    
-    const id = await createTask(title, description, due_date, priority, status, created_by, project_id);
-    res.status(201).json({ task_id: id });
+
+    const result = await createTask(title, description, due_date, priority, status, created_by, project_id);
+
+    if (result.warning) {
+      // ⚠️ Conflict! Send HTTP 409 with warning and conflicting tasks
+      return res.status(409).json({
+        warning: result.warning,
+        conflictingTasks: result.conflictingTasks,
+      });
+    }
+
+    // ✅ Success — send 201 with task ID
+    return res.status(201).json({
+      task_id: result.task_id,
+      message: result.message,
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Server error while creating task:", err);
+    return res.status(500).json({ error: err.message || "Server error" });
   }
 });
+
 
 // Get all tasks for a project
 router.get('/tasks/:project_id', async (req, res) => {
