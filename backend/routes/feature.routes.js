@@ -1,7 +1,7 @@
 const express = require('express');
 const cron = require('node-cron');
 const router = express.Router();
-const {addChecklistItem, setReminder,addComment,deleteChecklistItem,deleteComment,deleteReminder,updateChecklistItem} = require("../controllers/features.controllers")
+const {addChecklistItem, setReminder,addComment,deleteChecklistItem,deleteComment,deleteReminder,updateChecklistItem,getUserReminders} = require("../controllers/features.controllers")
 // ---------- CHECKLIST ----------
 
 const pool = require('../config/db');
@@ -115,7 +115,18 @@ router.post('/checklist', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
-
+  router.get('/reminders', verifyToken,async (req, res) => {
+    try {
+      console.log("Fetching reminders for user:", req.user.id);
+      
+      const reminders = await getUserReminders(req.user.id);
+      console.log("Fetched reminders:", reminders);
+      
+      res.json(reminders);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
   // ---------- COMMENTS ----------
   router.post('/comments', async (req, res) => {
     const { task_id, user_id, content } = req.body;

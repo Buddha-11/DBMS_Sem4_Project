@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const cron = require('node-cron');
+const pool = require('../config/db');
 const {
   createTask,
   getProjectTasks,
@@ -175,6 +177,38 @@ router.get('/checklist/:task_id', async (req, res) => {
 
 
 
+// IST offset in milliseconds (UTC +5:30 = 19800000 ms)
+const IST_OFFSET = 5.5 * 60 * 60 * 1000;
 
+// Schedule a job to run every 1 minute
+cron.schedule('* * * * *', async () => {
+  try {
+    const istNow = new Date(Date.now() + IST_OFFSET)
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' '); // Format: 'YYYY-MM-DD HH:MM:SS'
+
+    console.log(`[CRON] Checking for missed tasks at IST time: ${istNow}`);
+
+    const [result] = await pool.query(
+      `
+        UPDATE tasks 
+        SET status = 'Missed'
+        WHERE status != 'Completed' 
+          AND due_date < ?
+          AND (status != 'Missed' OR status IS NULL)
+      `,
+      [istNow]
+    );
+
+    if (result.affectedRows > 0) {
+      console.log(`[CRON] ✅ Marked ${result.affectedRows} tasks as Missed`);
+    } else {
+      console.log(`[CRON] No overdue tasks found at this run`);
+    }
+  } catch (err) {
+    console.error('[CRON] ❌ Error updating missed tasks:', err.message);
+  }
+});
 
 module.exports = router;

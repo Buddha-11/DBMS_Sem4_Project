@@ -40,6 +40,26 @@ const deleteReminder = async (reminder_id) => {
   );
   return result.affectedRows > 0;
 };
+const getUserReminders = async (user_id) => {
+  const [rows] = await pool.query(
+    `SELECT 
+       r.reminder_id, 
+       r.task_id, 
+       t.title AS task_title,
+       t.priority,
+       t.due_date,
+       r.reminder_time, 
+       r.method 
+     FROM reminder r
+     JOIN tasks t ON r.task_id = t.task_id
+     WHERE t.created_by = ?`,
+    [user_id]
+  );
+
+  console.log(rows); // Now includes task_title, priority, and due_date
+
+  return rows;
+};
 
 // ---------- COMMENTS ----------
 const addComment = async (task_id, user_id, content) => {
@@ -65,5 +85,6 @@ module.exports = {
   deleteComment,
   setReminder,
   deleteReminder,
-  updateChecklistItem
+  updateChecklistItem,
+  getUserReminders
 };

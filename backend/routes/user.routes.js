@@ -49,7 +49,9 @@ router.get('/users', verifyToken, async (req, res) => {
   }
 });
 
-router.put('/users', async (req, res) => {
+
+router.put('/users',verifyToken, async (req, res) => {
+
   try {
     const updated = await updateUser(req.user.id, req.body);
     updated
