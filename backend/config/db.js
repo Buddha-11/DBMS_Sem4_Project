@@ -45,7 +45,7 @@ const initializeDB = async () => {
         created_by INT,
         project_id INT,
         FOREIGN KEY (created_by) REFERENCES users(user_id),
-        FOREIGN KEY (project_id) REFERENCES projects(project_id)
+        FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
       );
 
 
